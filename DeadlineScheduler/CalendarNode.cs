@@ -9,7 +9,9 @@ namespace DeadlineScheduler
 {
 	class CalendarNode : Panel
 	{
-		public int numDates = 0;
+		public int rowid { get; set; }
+		public DateTime date { get; set; }
+		public int numDates { get; set; }
 
 		public CalendarNode(int x, int y)
 		{
@@ -19,6 +21,10 @@ namespace DeadlineScheduler
 			//this.BackColor = System.Drawing.Color.Black;
 			this.BorderStyle = BorderStyle.FixedSingle;
 			this.BackColor = System.Drawing.Color.White;
+
+			numDates = 0;
+			date = new DateTime();
+			rowid = -1;
 		}
 	}
 }

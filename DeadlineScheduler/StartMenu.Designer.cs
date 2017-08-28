@@ -33,13 +33,12 @@
 			this.ScheduleNameBox = new System.Windows.Forms.TextBox();
 			this.SaveOptionBox = new System.Windows.Forms.CheckBox();
 			this.panel1 = new System.Windows.Forms.Panel();
-			this.ScheduleList = new System.Windows.Forms.ListBox();
+			this.SchedulesPanel = new System.Windows.Forms.Panel();
 			this.CreateScheduleBtn = new System.Windows.Forms.Button();
 			this.CancelBtn = new System.Windows.Forms.Button();
 			this.button1 = new System.Windows.Forms.Button();
 			this.NewScheduleBtn = new System.Windows.Forms.Button();
 			this.label2 = new System.Windows.Forms.Label();
-			this.SchedulesPanel = new System.Windows.Forms.Panel();
 			this.panel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -59,9 +58,9 @@
 			this.CloseBtn.FlatAppearance.BorderSize = 0;
 			this.CloseBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.CloseBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.CloseBtn.Location = new System.Drawing.Point(1099, 7);
+			this.CloseBtn.Location = new System.Drawing.Point(1102, 7);
 			this.CloseBtn.Name = "CloseBtn";
-			this.CloseBtn.Size = new System.Drawing.Size(47, 33);
+			this.CloseBtn.Size = new System.Drawing.Size(44, 33);
 			this.CloseBtn.TabIndex = 3;
 			this.CloseBtn.Text = "x";
 			this.CloseBtn.UseVisualStyleBackColor = false;
@@ -97,7 +96,6 @@
 			// 
 			this.panel1.BackColor = System.Drawing.Color.WhiteSmoke;
 			this.panel1.Controls.Add(this.SchedulesPanel);
-			this.panel1.Controls.Add(this.ScheduleList);
 			this.panel1.Controls.Add(this.ScheduleNameBox);
 			this.panel1.Controls.Add(this.SaveOptionBox);
 			this.panel1.Controls.Add(this.CreateScheduleBtn);
@@ -107,18 +105,12 @@
 			this.panel1.Size = new System.Drawing.Size(1155, 517);
 			this.panel1.TabIndex = 6;
 			// 
-			// ScheduleList
+			// SchedulesPanel
 			// 
-			this.ScheduleList.BackColor = System.Drawing.Color.WhiteSmoke;
-			this.ScheduleList.BorderStyle = System.Windows.Forms.BorderStyle.None;
-			this.ScheduleList.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.ScheduleList.FormattingEnabled = true;
-			this.ScheduleList.ItemHeight = 18;
-			this.ScheduleList.Location = new System.Drawing.Point(123, 31);
-			this.ScheduleList.Name = "ScheduleList";
-			this.ScheduleList.Size = new System.Drawing.Size(575, 306);
-			this.ScheduleList.TabIndex = 7;
-			this.ScheduleList.SelectedIndexChanged += new System.EventHandler(this.ScheduleList_SelectedIndexChanged);
+			this.SchedulesPanel.Location = new System.Drawing.Point(115, 31);
+			this.SchedulesPanel.Name = "SchedulesPanel";
+			this.SchedulesPanel.Size = new System.Drawing.Size(575, 306);
+			this.SchedulesPanel.TabIndex = 11;
 			// 
 			// CreateScheduleBtn
 			// 
@@ -185,13 +177,6 @@
 			this.label2.Size = new System.Drawing.Size(100, 4);
 			this.label2.TabIndex = 9;
 			// 
-			// SchedulesPanel
-			// 
-			this.SchedulesPanel.Location = new System.Drawing.Point(115, 189);
-			this.SchedulesPanel.Name = "SchedulesPanel";
-			this.SchedulesPanel.Size = new System.Drawing.Size(575, 306);
-			this.SchedulesPanel.TabIndex = 11;
-			// 
 			// StartMenu
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -224,7 +209,6 @@
 		private System.Windows.Forms.Panel panel1;
 		private System.Windows.Forms.Button NewScheduleBtn;
 		private System.Windows.Forms.Button button1;
-		private System.Windows.Forms.ListBox ScheduleList;
 		private System.Windows.Forms.Button CancelBtn;
 		private System.Windows.Forms.Button CreateScheduleBtn;
 		private System.Windows.Forms.Label label2;

@@ -7,15 +7,8 @@ using System.Windows.Forms;
 
 namespace DeadlineScheduler
 {
-	class ScheduleButton : Button
+	class DueDateTextBox : TextBox
 	{
 		public int rowid { get; set; }
-		public string name { get; set; }
-
-		public ScheduleButton(int _rowid, string _name)
-		{
-			rowid = _rowid;
-			name = _name;
-		}
 	}
 }

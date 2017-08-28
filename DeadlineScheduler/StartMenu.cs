@@ -30,7 +30,7 @@ namespace DeadlineScheduler
 		}
 
 		private bool firstClickOnScheduleNameBox = true;
-
+		private int scheduleCount = 0;
 		private SQLiteConnection SQLCon;
 
 		public StartMenu()
@@ -57,7 +57,7 @@ namespace DeadlineScheduler
 				{
 					if (reader.Read())
 					{
-						using (SQLiteCommand loadSchedules = new SQLiteCommand("SELECT rowid, name FROM schedule_names", SQLCon))
+						using (SQLiteCommand loadSchedules = new SQLiteCommand("SELECT rowid, name, last_update FROM schedule_names", SQLCon))
 						{
 							reader.Close();
 
@@ -66,7 +66,7 @@ namespace DeadlineScheduler
 								while (reader1.Read())
 								{
 									//ScheduleList.Items.Add((string)reader1[0]);
-									AddScheduleToPanel(Convert.ToInt32((Int64)reader1[0]), (string)reader1[1]);
+									AddScheduleToPanel(Convert.ToInt32((Int64)reader1[0]), (string)reader1[1], (DateTime)reader1[2]);
 								}
 							}
 						}						
@@ -75,7 +75,7 @@ namespace DeadlineScheduler
 					{
 						reader.Close();
 						
-						using (SQLiteCommand createTable = new SQLiteCommand("CREATE TABLE schedule_names (name nvarchar(45))", SQLCon))
+						using (SQLiteCommand createTable = new SQLiteCommand("CREATE TABLE schedule_names (name nvarchar(45), last_update datetime)", SQLCon))
 						{
 							createTable.ExecuteNonQuery();
 						}
@@ -118,13 +118,25 @@ namespace DeadlineScheduler
 		{
 			if (ScheduleNameBox.Text != "")
 			{
-				using (SQLiteCommand cmd = new SQLiteCommand("INSERT INTO schedule_names (name) VALUES (@name)", SQLCon))
+				DateTime createDate = DateTime.Now;
+
+				using (SQLiteCommand cmd = new SQLiteCommand("INSERT INTO schedule_names (name, last_update) VALUES (@name, @last_update)", SQLCon))
 				{
 					cmd.Parameters.AddWithValue("@name", ScheduleNameBox.Text);
+					cmd.Parameters.AddWithValue("@last_update", createDate);
 					cmd.ExecuteNonQuery();
 				}
 
-				ScheduleList.Items.Add(ScheduleNameBox.Text);
+				Int64 rowid = SQLCon.LastInsertRowId;
+				//MessageBox.Show(rowid.ToString() + " $");
+				using (SQLiteCommand cmd = new SQLiteCommand("CREATE TABLE sched_" + rowid.ToString() + " (name nvarchar(45), tag_id int, date datetime); CREATE TABLE tag_ids_" + rowid.ToString() + " (name nvarchar(20), color_id int)", SQLCon))
+				{
+					cmd.ExecuteNonQuery();
+				}
+
+
+				AddScheduleToPanel(Convert.ToInt32(rowid), ScheduleNameBox.Text, createDate);
+				//ScheduleList.Items.Add(ScheduleNameBox.Text);
 
 				ScheduleNameBox.Visible = false;
 				CancelBtn.Visible = false;
@@ -148,13 +160,13 @@ namespace DeadlineScheduler
 
 		private void ScheduleList_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if (ScheduleList.SelectedItem != null)
-			{
-				MessageBox.Show(ScheduleList.SelectedItem.ToString());
-			}
+			//if (ScheduleList.SelectedItem != null)
+			//{
+			//	MessageBox.Show(ScheduleList.SelectedItem.ToString());
+			//}
 		}
 
-		private void AddScheduleToPanel(int rowid, string scheduleName)
+		private void AddScheduleToPanel(int rowid, string scheduleName, DateTime lastUpdate)
 		{
 			ScheduleButton b = new ScheduleButton(rowid, scheduleName);
 			b.Text = scheduleName;
@@ -165,12 +177,27 @@ namespace DeadlineScheduler
 			b.Cursor = Cursors.Hand;
 			b.Font = new Font(b.Font.FontFamily, 9, FontStyle.Regular);
 			b.Click += ShowSchedule;
+			b.Location = new Point(0, 60 * scheduleCount);
+			b.FlatAppearance.MouseOverBackColor = Color.Transparent;
+			b.FlatAppearance.MouseDownBackColor = Color.Transparent;
+
+			Label l = new Label();
+			l.Text = "Last Updated: " + lastUpdate.ToString("MM/dd/yyyy hh:mm tt");
+			l.AutoSize = true;
+			l.Font = new Font(l.Font, FontStyle.Italic);
+			l.Location = new Point(5, 30 + 60 * scheduleCount++);
+			l.ForeColor = Color.DarkGray;
+
 			SchedulesPanel.Controls.Add(b);
+			SchedulesPanel.Controls.Add(l);
 		}
 
 		private void ShowSchedule(object sender, EventArgs e)
 		{
+			ScheduleButton b = (ScheduleButton)sender;
 
+			ScheduleView s = new ScheduleView(SQLCon, b.rowid);
+			s.Show();
 		}
 	}
 }

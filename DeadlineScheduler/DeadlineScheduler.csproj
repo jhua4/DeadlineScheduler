@@ -70,7 +70,10 @@
     <Compile Include="CalendarNode.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Class.cs" />
+    <Compile Include="Tag.cs" />
+    <Compile Include="DueDateTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ScheduleButton.cs">
       <SubType>Component</SubType>
     </Compile>
