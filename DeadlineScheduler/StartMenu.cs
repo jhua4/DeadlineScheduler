@@ -65,7 +65,6 @@ namespace DeadlineScheduler
 							{
 								while (reader1.Read())
 								{
-									//ScheduleList.Items.Add((string)reader1[0]);
 									AddScheduleToPanel(Convert.ToInt32((Int64)reader1[0]), (string)reader1[1], (DateTime)reader1[2]);
 								}
 							}
@@ -136,7 +135,6 @@ namespace DeadlineScheduler
 
 
 				AddScheduleToPanel(Convert.ToInt32(rowid), ScheduleNameBox.Text, createDate);
-				//ScheduleList.Items.Add(ScheduleNameBox.Text);
 
 				ScheduleNameBox.Visible = false;
 				CancelBtn.Visible = false;
@@ -196,8 +194,13 @@ namespace DeadlineScheduler
 		{
 			ScheduleButton b = (ScheduleButton)sender;
 
-			ScheduleView s = new ScheduleView(SQLCon, b.rowid);
+			ScheduleView s = new ScheduleView(SQLCon, b.rowid, b.Text);
 			s.Show();
+		}
+
+		private void panel1_Paint(object sender, PaintEventArgs e)
+		{
+
 		}
 	}
 }

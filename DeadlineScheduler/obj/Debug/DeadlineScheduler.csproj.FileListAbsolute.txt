@@ -30,7 +30,6 @@ C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\bin\Debug\EntityF
 C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\bin\Debug\EntityFramework.SqlServer.xml
 C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\bin\Debug\System.Data.SQLite.xml
 C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\bin\Debug\System.Data.SQLite.dll.config
-C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\obj\Debug\DeadlineScheduler.csprojResolveAssemblyReference.cache
 C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\obj\Debug\DeadlineScheduler.ScheduleView.resources
 C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\obj\Debug\DeadlineScheduler.Properties.Resources.resources
 C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\obj\Debug\DeadlineScheduler.StartMenu.resources
@@ -38,3 +37,8 @@ C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\obj\Debug\Deadlin
 C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\obj\Debug\DeadlineScheduler.csproj.CoreCompileInputs.cache
 C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\obj\Debug\DeadlineScheduler.exe
 C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\obj\Debug\DeadlineScheduler.pdb
+C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\obj\Debug\DeadlineScheduler.csprojResolveAssemblyReference.cache
+C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\bin\Debug\DeadlineScheduler.exe.manifest
+C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\bin\Debug\DeadlineScheduler.application
+C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\obj\Debug\DeadlineScheduler.exe.manifest
+C:\Users\joshuahua\Desktop\DeadlineScheduler\DeadlineScheduler\obj\Debug\DeadlineScheduler.application

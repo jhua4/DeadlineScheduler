@@ -26,5 +26,10 @@ namespace DeadlineScheduler
 			date = new DateTime();
 			rowid = -1;
 		}
+
+		public void SetLocation(int x, int y)
+		{
+			this.Location = new System.Drawing.Point(x, y);
+		}
 	}
 }

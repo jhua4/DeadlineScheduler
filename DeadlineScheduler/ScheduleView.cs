@@ -9,61 +9,58 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SQLite;
 using System.IO;
+using System.Reflection;
 
 namespace DeadlineScheduler
 {
 	public partial class ScheduleView : Form
 	{
-		public ScheduleView(SQLiteConnection _SQLCon, int rowid)
+		public ScheduleView(SQLiteConnection _SQLCon, int rowid, string _sched_name)
 		{
 			InitializeComponent();
 
 			SQLCon = _SQLCon;
 			sched_table = "sched_" + rowid.ToString();
 			tag_ids_table = "tag_ids_" + rowid.ToString();
+			sched_row_id = rowid;
 		}
 
 		private SQLiteConnection SQLCon;
 		private string sched_table = "";
 		private string tag_ids_table = "";
+		private int sched_row_id;
+		private string sched_name = "";
 
-		//private int current_tag_id = -1;
+		private DateTime firstDay;
 
 		CalendarNode[] cNodes;
-
 		Dictionary<DateTime, CalendarNode> days;
-
 		Dictionary<int, Tag> tags;
-
-		//Tag[] classes;
-
 		Color[] colors = new Color[] { Color.Purple, Color.Orange, Color.DeepSkyBlue, Color.ForestGreen, Color.Fuchsia, Color.Navy };
+		ColorUsed[] colorsUsed;
 
 		private int colorIter = 0;
 
 		private int classCount = 0;
 
 		private int width = 160;
-		private int height = 130;
-		private int x_offset = 15;
+		private int height = 150;
+		private int x_offset = 20;
 		private int y_offset = 100;
 		
 		RoundPanel calendar = new RoundPanel();
 
-		private SQLiteConnection CreateSQLiteConnection()
-		{
-			string path = AppDomain.CurrentDomain.BaseDirectory;
-			path = path.Replace(@"bin\Debug\", "");
-
-			SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder();
-			builder.FailIfMissing = true;
-			builder.DataSource = Path.Combine(path, "ProjectDB.db"); ;
-
-			return new SQLiteConnection(builder.ConnectionString);
-		}
-
 		private void Form1_Load(object sender, EventArgs e)
 		{
+			this.Text = sched_name;
+
+			colorsUsed = new ColorUsed[6];
+
+			for (int i = 0; i < 6; i++)
+			{
+				colorsUsed[i] = new ColorUsed(colors[i]);
+			}
+
 			days = new Dictionary<DateTime, CalendarNode>();
 			tags = new Dictionary<int, Tag>();
 
@@ -73,11 +70,12 @@ namespace DeadlineScheduler
 			calendar.Text = DateTime.Now.ToString("MMMM");
 			this.Controls.Add(calendar);
 
-			//classes = new Tag[100];
-
 			CreateDayOfWeekLabels();
 
-			LoadMonth(DateTime.Now.Month, DateTime.Now.Year);
+			LoadTags();
+
+			firstDay = DateTime.Now.StartOfWeek(DayOfWeek.Sunday);
+			LoadMonth(DateTime.Now.StartOfWeek(DayOfWeek.Sunday));
 		}
 
 		private void CreateDayOfWeekLabels()
@@ -86,155 +84,172 @@ namespace DeadlineScheduler
 			{
 				Label l = new Label();
 				l.Text = Enum.GetName(typeof(DayOfWeek), i).Substring(0, 2) + "                                          ";
-				//MessageBox.Show(l.Text);
 				l.Location = new Point(i * width + x_offset, 40);
-				//MessageBox.Show(l.Location.ToString());
-				//l.Visible = true;
-				//l.Name = "Label" + i.ToString();
-				//l.AutoSize = true;
 				l.Visible = true;
 				l.AutoSize = false;
 				l.Width = 160;
 				l.Font = new Font(l.Font.FontFamily, 14, FontStyle.Underline);
 				calendar.Controls.Add(l);
-				//this.Controls.Add(l);
 			}
 		}
 
-		private void LoadMonth(int monthIndex, int yearIndex)
+		private Color GetLeastUsedColor()
 		{
-			int numOfDays = DateTime.DaysInMonth(yearIndex, monthIndex);
-			int numOfDaysLeft = numOfDays - 1;
+			int min = 1000;
+			int index = -1;
 
-			cNodes = new CalendarNode[numOfDays];
-
-			DateTime firstDay = new DateTime(yearIndex, monthIndex, 1);
-
-			int firstDayIndex = (int)firstDay.DayOfWeek;
-
-			//MessageBox.Show(firstDayIndex.ToString());
-
-			int rowCount = 0;
-
-			for (int i = firstDayIndex; i < 7; i++)
+			for (int i = 0; i < colorsUsed.Length; i++)
 			{
-				CalendarNode cNode = new CalendarNode(i * width + x_offset, rowCount * height + y_offset);
-
-				Label l = new Label();
-				l.Text = (numOfDays - numOfDaysLeft).ToString();
-				l.Visible = true;
-				l.Size = new Size(30, 15);
-
-				cNode.date = new DateTime(DateTime.Now.Year, monthIndex, numOfDays - numOfDaysLeft);
-
-				cNode.Controls.Add(l);
-				cNode.Click += CalendarNode_Click;
-				calendar.Controls.Add(cNode);
-				cNodes[i] = cNode;
-
-				days[cNode.date] = cNode;
-
-				numOfDaysLeft--;
+				if (colorsUsed[i].count < min)
+				{
+					min = colorsUsed[i].count;
+					index = i;
+				}
 			}
 
-			rowCount++;
+			colorsUsed[index].count++;
 
-			while (numOfDaysLeft > 0)
+			return colorsUsed[index].color;
+		}
+
+		private void LoadWeek(DateTime firstDay, int rowIndex)
+		{
+			//this week has already been loaded
+			if (days.ContainsKey(firstDay))
 			{
-				for (int j = 0; j < 7; j++)
+				for (int i = 0; i < 7; i++)
 				{
-					if (numOfDaysLeft >= 0)
+					days[firstDay.AddDays(i)].SetLocation(i * width + x_offset, rowIndex * height + y_offset);
+					calendar.Controls.Add(days[firstDay.AddDays(i)]);
+				}
+			} else
+			{
+				//this week has not been loaded yet
+				for (int i = 0; i < 7; i++)
+				{
+					CalendarNode cNode = new CalendarNode(i * width + x_offset, rowIndex * height + y_offset);
+
+					Label l = new Label();
+					l.Text = firstDay.ToString("MMM") + " " + firstDay.AddDays(i).Day.ToString();
+					l.Visible = true;
+					l.Size = new Size(90, 18);
+					l.Location = new Point(10, 0);
+
+					cNode.date = firstDay.AddDays(i);
+
+					if (cNode.date == new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day))
 					{
-						CalendarNode cNode = new CalendarNode(j * width + x_offset, rowCount * height + y_offset);
+						Label ll = new Label();
+						ll.BackColor = Color.Green;
+						ll.AutoSize = false;
+						ll.Size = new Size(160, 5);
+						ll.Location = new Point(0, 115);
+						cNode.Controls.Add(ll);
+					}
 
-						Label l = new Label();
-						l.Text = (numOfDays - numOfDaysLeft).ToString();
-						//MessageBox.Show((numOfDays - numOfDaysLeft).ToString());
-						l.Visible = true;
-						l.Size = new Size(30, 15);
+					cNode.Controls.Add(l);
+					cNode.Click += CalendarNode_Click;
+					calendar.Controls.Add(cNode);
 
-						cNode.date = new DateTime(DateTime.Now.Year, monthIndex, numOfDays - numOfDaysLeft);
+					days[cNode.date] = cNode;
+				}
 
-						cNode.Controls.Add(l);
-						cNode.Click += CalendarNode_Click;
-						calendar.Controls.Add(cNode);
-						//cNodes[i] = cNode;
-						numOfDaysLeft--;
+				if (firstDay == DateTime.Now.StartOfWeek(DayOfWeek.Sunday))
+				{
+					Label l = new Label();
+					l.BackColor = Color.Green;
+					l.AutoSize = false;
+					l.Size = new Size(5, 120);
+					l.Location = new Point(0, 0);
+					days[firstDay].Controls.Add(l);
+					//MessageBox.Show("?" + firstDay.ToString());
+				}
 
-						days[cNode.date] = cNode;
+				using (SQLiteCommand cmd = new SQLiteCommand("SELECT *, rowid FROM " + sched_table + " WHERE date >= @fd AND date <= @ld", SQLCon))
+				{
+					cmd.Parameters.AddWithValue("@fd", firstDay);
+					cmd.Parameters.AddWithValue("@ld", firstDay.AddDays(6));
+
+					using (SQLiteDataReader reader = cmd.ExecuteReader())
+					{
+						while (reader.Read())
+						{
+							DateTime date = (DateTime)reader[2];
+
+							Label l = new Label();
+							l.Location = new Point(5, 20 * ++days[date].numDates);
+
+							int tagid = (int)reader[1];
+
+							string dueDateName = (string)reader[0];
+
+							int rowid = Convert.ToInt32((Int64)reader[3]);
+
+							if (tagid != -1)
+							{
+								l.Text = tags[(int)reader[1]].tagNameBox.Text;
+								l.ForeColor = tags[(int)reader[1]].color;
+								l.Size = TextRenderer.MeasureText(l.Text, l.Font);
+
+								DueDateTextBox t = new DueDateTextBox();
+								t.Text = dueDateName;
+								t.Location = new Point(l.Width + 5, 20 * days[date].numDates);
+								t.Size = new Size(110, 18);
+								t.BorderStyle = BorderStyle.None;
+								t.LostFocus += DueDateBox_Leave;
+								t.rowid = rowid;
+
+								days[date].Controls.Add(l);
+								days[date].Controls.Add(t);
+							}
+							else
+							{
+								DueDateTextBox t = new DueDateTextBox();
+								t.Text = dueDateName;
+								t.Location = new Point(10, 20 * days[date].numDates);
+								t.Size = new Size(110, 18);
+								t.BorderStyle = BorderStyle.None;
+								t.LostFocus += DueDateBox_Leave;
+								t.rowid = rowid;
+
+								days[date].Controls.Add(t);
+							}
+						}
 					}
 				}
-				rowCount++;
 			}
+		}
 
+		private void LoadTags()
+		{
 			using (SQLiteCommand cmd = new SQLiteCommand("SELECT *, rowid FROM " + tag_ids_table, SQLCon))
 			{
 				using (SQLiteDataReader reader = cmd.ExecuteReader())
 				{
 					while (reader.Read())
 					{
-						Tag t = new Tag(colors[(int)reader[1]], SQLCon, tag_ids_table);
+						Tag t = new Tag(colorsUsed[(int)reader[1]].color, SQLCon, tag_ids_table);
 
 						TagPanel.Controls.Add(t.InitRB(++classCount));
 						TagPanel.Controls.Add(t.InitNamebox(classCount));
 						t.tagNameBox.Text = (string)reader[0];
 						t.rowid = Convert.ToInt32((Int64)reader[2]);
 						tags[Convert.ToInt32((Int64)reader[2])] = t;
-
-						//MessageBox.Show("Added tag id " + (Convert.ToInt32((Int64)reader[2])).ToString());
 					}
 				}
 			}
+		}
 
-			using (SQLiteCommand cmd = new SQLiteCommand("SELECT * FROM " + sched_table, SQLCon))
-			{
-				using (SQLiteDataReader reader = cmd.ExecuteReader())
-				{
-					while (reader.Read())
-					{
-						DateTime date = (DateTime)reader[2];
+		private void LoadMonth(DateTime firstDay)
+		{
+			calendar.Controls.Clear();
 
-						Label l = new Label();
-						l.Location = new Point(5, 20 * ++days[date].numDates);
+			LoadWeek(firstDay, 0);
+			LoadWeek(firstDay.AddDays(7), 1);
+			LoadWeek(firstDay.AddDays(14), 2);
+			LoadWeek(firstDay.AddDays(21), 3);
 
-						int tagid = (int)reader[1];
-
-						//MessageBox.Show("$searching for tag id " + tagid.ToString());
-
-						if (tagid != -1)
-						{
-							l.Text = tags[(int)reader[1]].tagNameBox.Text;
-							l.ForeColor = tags[(int)reader[1]].color;
-							l.Size = TextRenderer.MeasureText(l.Text, l.Font);
-
-							DueDateTextBox t = new DueDateTextBox();
-							t.Text = "HW #1";
-							t.Location = new Point(l.Width + 5, 20 * days[date].numDates);
-							t.Size = new Size(110, 18);
-							t.BorderStyle = BorderStyle.None;
-							t.LostFocus += DueDateBox_Leave;
-
-							days[date].Controls.Add(l);
-							days[date].Controls.Add(t);
-						} else
-						{
-							//l.Text = tags[(int)reader[1]].tagNameBox.Text;
-							//l.ForeColor = tags[(int)reader[1]].color;
-							//l.Size = TextRenderer.MeasureText(l.Text, l.Font);
-
-							DueDateTextBox t = new DueDateTextBox();
-							t.Text = "HW #1";
-							t.Location = new Point(10, 20 * days[date].numDates);
-							t.Size = new Size(110, 18);
-							t.BorderStyle = BorderStyle.None;
-							t.LostFocus += DueDateBox_Leave;
-
-							//days[date].Controls.Add(l);
-							days[date].Controls.Add(t);
-						}
-					}
-				}
-			}
+			calendar.Text = firstDay.ToString("MMM") + " " + firstDay.Day.ToString() + " - " + firstDay.AddDays(27).ToString("MMM") + " " + firstDay.AddDays(27).Day.ToString();
 		}
 
 		private Tuple<Label, int> GetSelectedTagInfo()
@@ -269,7 +284,7 @@ namespace DeadlineScheduler
 
 			if (nodeClicked.numDates == 4)
 				return;
-
+			
 			DateTime dueDate = nodeClicked.date;
 
 			Tuple<Label, int> tag = GetSelectedTagInfo();
@@ -301,31 +316,27 @@ namespace DeadlineScheduler
 		private void DueDateBox_Leave(object sender, EventArgs e)
 		{
 			DueDateTextBox t = (DueDateTextBox)sender;
-			int rowid = t.rowid;
 
 			//MessageBox.Show(rowid.ToString());
 
 			using (SQLiteCommand cmd = new SQLiteCommand("UPDATE " + sched_table + " SET name = @name where rowid = @rowid", SQLCon))
 			{
 				cmd.Parameters.AddWithValue("@name", t.Text);
-				cmd.Parameters.AddWithValue("@rowid", rowid);
+				cmd.Parameters.AddWithValue("@rowid", t.rowid);
 				cmd.ExecuteNonQuery();
 			}
 		}
 
 		private void AddBtn_Click(object sender, EventArgs e)
 		{
-			if (colorIter == colors.Length)
+			if (colorIter == colorsUsed.Length)
 				colorIter = 0;
 
-			Tag t = new Tag(colors[colorIter++], SQLCon, tag_ids_table);
+			Tag t = new Tag(colorsUsed[colorIter].color, SQLCon, tag_ids_table);
+			colorsUsed[colorIter++].count++;
 
-			TagPanel.Controls.Add(t.InitRB(classCount));
+			TagPanel.Controls.Add(t.InitRB(++classCount));
 			TagPanel.Controls.Add(t.InitNamebox(classCount));
-
-			//classes[classCount++] = t;
-
-			
 
 			using (SQLiteCommand cmd = new SQLiteCommand("INSERT INTO " + tag_ids_table + " (name, color_id) VALUES (@name, @color_id)", SQLCon))
 			{
@@ -335,10 +346,49 @@ namespace DeadlineScheduler
 			}
 
 			t.rowid = Convert.ToInt32(SQLCon.LastInsertRowId);
-			MessageBox.Show("&&" + t.rowid.ToString());
 
 			tags[t.rowid] = t;
 
+		}
+
+		private void UpButton_Click(object sender, EventArgs e)
+		{
+			firstDay = firstDay.AddDays(-7);
+			LoadMonth(firstDay);
+		}
+
+		private void DownButton_Click(object sender, EventArgs e)
+		{
+			firstDay = firstDay.AddDays(7);
+			LoadMonth(firstDay);
+		}
+
+		private void ScheduleView_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			using (SQLiteCommand cmd = new SQLiteCommand("UPDATE schedule_names SET last_update = @now WHERE rowid = @rowid", SQLCon))
+			{
+				cmd.Parameters.AddWithValue("@now", DateTime.Now);
+				cmd.Parameters.AddWithValue("@rowid", sched_row_id);
+				cmd.ExecuteNonQuery();
+			}
+		}
+
+		private void ScheduleView_Click(object sender, EventArgs e)
+		{
+			
+		}
+	}
+
+	public static class DateTimeExtensions
+	{
+		public static DateTime StartOfWeek(this DateTime dt, DayOfWeek startOfWeek)
+		{
+			int diff = dt.DayOfWeek - startOfWeek;
+			if (diff < 0)
+			{
+				diff += 7;
+			}
+			return dt.AddDays(-1 * diff).Date;
 		}
 	}
 }
