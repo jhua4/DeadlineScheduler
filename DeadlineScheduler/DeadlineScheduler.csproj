@@ -108,6 +108,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ColorUsed.cs" />
+    <Compile Include="RemoveLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Tag.cs" />
     <Compile Include="DueDateTextBox.cs">
       <SubType>Component</SubType>
@@ -146,6 +149,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="StartMenu.resx">
       <DependentUpon>StartMenu.cs</DependentUpon>
@@ -168,6 +172,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="calendar-icon.ico" />
+    <None Include="Resources\trash small 2.png" />
+    <None Include="Resources\trash small 1.png" />
+    <None Include="Resources\trash small.jpg" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">

@@ -12,6 +12,7 @@ namespace DeadlineScheduler
 		public int rowid { get; set; }
 		public DateTime date { get; set; }
 		public int numDates { get; set; }
+		public RemoveLabel removeLabel;
 
 		public CalendarNode(int x, int y)
 		{
@@ -30,6 +31,11 @@ namespace DeadlineScheduler
 		public void SetLocation(int x, int y)
 		{
 			this.Location = new System.Drawing.Point(x, y);
+		}
+
+		public void s()
+		{
+			removeLabel.Visible = false;
 		}
 	}
 }

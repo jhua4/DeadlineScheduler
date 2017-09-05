@@ -134,6 +134,7 @@ namespace DeadlineScheduler
 					l.Visible = true;
 					l.Size = new Size(90, 18);
 					l.Location = new Point(10, 0);
+					l.BackColor = Color.Transparent;
 
 					cNode.date = firstDay.AddDays(i);
 
@@ -142,13 +143,82 @@ namespace DeadlineScheduler
 						Label ll = new Label();
 						ll.BackColor = Color.Green;
 						ll.AutoSize = false;
-						ll.Size = new Size(160, 5);
-						ll.Location = new Point(0, 115);
+						ll.Size = new Size(160, 6);
+						ll.Location = new Point(0, 114);
 						cNode.Controls.Add(ll);
 					}
 
+					RemoveLabel r = new RemoveLabel();
+					r.Location = new Point(32, 95);
+					r.Visible = false;
+
+					r.DragDrop += (o, e) => {
+						e.Effect = DragDropEffects.Copy;
+						r.SendToBack();
+						r.Font = new Font(r.Font, FontStyle.Regular);
+						r.Text = r.Text.Substring(3);
+						r.Width -= 5;
+
+						int rowid = (int)e.Data.GetData(typeof(int));
+
+						CalendarNode parent = (CalendarNode)r.Parent;
+
+						DueDateTextBox d = null;
+
+						foreach (Control c in parent.Controls)
+						{
+							if (c is DueDateTextBox)
+							{
+								if (((DueDateTextBox)c).rowid == rowid)
+								{
+									d = (DueDateTextBox)c;
+								}
+							}
+						}
+
+						if (MessageBox.Show("Are you sure you want to delete \"" + d.Text + "\"?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
+						{
+							using (SQLiteCommand cmd = new SQLiteCommand("DELETE FROM " + sched_table + " WHERE rowid = @rowid", SQLCon))
+							{
+								cmd.Parameters.AddWithValue("@rowid", rowid);
+								cmd.ExecuteNonQuery();
+							}
+
+							parent.Controls.Remove(d.dotLabel);
+
+							if (d.tagLabel != null)
+								parent.Controls.Remove(d.tagLabel);
+
+							parent.Controls.Remove(d);
+							parent.numDates--;
+						}
+
+						r.Visible = false;
+					};
+
+					r.DragEnter+= (o, e) => {
+						e.Effect = DragDropEffects.Copy;
+						r.SendToBack();
+						r.Font = new Font(r.Font, FontStyle.Bold);
+						r.Text = "   " + r.Text;
+						r.Width += 5;
+					};
+
+					r.DragLeave += (o, e) => {
+						r.Font = new Font(r.Font, FontStyle.Regular);
+						r.Text = r.Text.Substring(3);
+						r.Width -= 5;
+					};
+
+					r.AllowDrop = true;
+
+					cNode.removeLabel = r;
+
+					cNode.Controls.Add(r);
 					cNode.Controls.Add(l);
+
 					cNode.Click += CalendarNode_Click;
+
 					calendar.Controls.Add(cNode);
 
 					days[cNode.date] = cNode;
@@ -177,7 +247,7 @@ namespace DeadlineScheduler
 							DateTime date = (DateTime)reader[2];
 
 							Label l = new Label();
-							l.Location = new Point(5, 20 * ++days[date].numDates);
+							l.Location = new Point(10, 20 * ++days[date].numDates);
 
 							int tagid = (int)reader[1];
 
@@ -190,28 +260,31 @@ namespace DeadlineScheduler
 								l.Text = tags[(int)reader[1]].tagNameBox.Text;
 								l.ForeColor = tags[(int)reader[1]].color;
 								l.Size = TextRenderer.MeasureText(l.Text, l.Font);
+								l.BackColor = Color.Transparent;
 
-								DueDateTextBox t = new DueDateTextBox();
+								DueDateTextBox t = new DueDateTextBox(l, l.Width, days[date]);
 								t.Text = dueDateName;
-								t.Location = new Point(l.Width + 5, 20 * days[date].numDates);
-								t.Size = new Size(110, 18);
+								t.Location = new Point(l.Width + 10, 20 * days[date].numDates);
+								t.Size = new Size(100, 18);
 								t.BorderStyle = BorderStyle.None;
 								t.LostFocus += DueDateBox_Leave;
 								t.rowid = rowid;
 
+								days[date].Controls.Add(t.InitDotLabel(5, 20 * days[date].numDates + 5, l.ForeColor));
 								days[date].Controls.Add(l);
 								days[date].Controls.Add(t);
 							}
 							else
 							{
-								DueDateTextBox t = new DueDateTextBox();
+								DueDateTextBox t = new DueDateTextBox(l, -1, days[date]);
 								t.Text = dueDateName;
-								t.Location = new Point(10, 20 * days[date].numDates);
-								t.Size = new Size(110, 18);
+								t.Location = new Point(13, 20 * days[date].numDates);
+								t.Size = new Size(100, 18);
 								t.BorderStyle = BorderStyle.None;
 								t.LostFocus += DueDateBox_Leave;
 								t.rowid = rowid;
 
+								days[date].Controls.Add(t.InitDotLabel(5, 20 * days[date].numDates + 5, Color.Black));
 								days[date].Controls.Add(t);
 							}
 						}
@@ -255,7 +328,7 @@ namespace DeadlineScheduler
 		private Tuple<Label, int> GetSelectedTagInfo()
 		{
 			Label l = new Label();
-			l.Text = "Class ?";
+			l.Text = "";
 			l.Visible = true;
 			//l.AutoSize = true;
 
@@ -288,21 +361,39 @@ namespace DeadlineScheduler
 			DateTime dueDate = nodeClicked.date;
 
 			Tuple<Label, int> tag = GetSelectedTagInfo();
-			MessageBox.Show("tag id " + tag.Item2.ToString());
+			
+			
+
 			Label l = tag.Item1;
 			l.Location = new Point(5, 20 * ++nodeClicked.numDates);
 
-			DueDateTextBox t = new DueDateTextBox();
-			t.Text = "HW #1";
-			t.Location = new Point(l.Width + 5, 20 * nodeClicked.numDates);
-			t.Size = new Size(110, 18);
-			t.BorderStyle = BorderStyle.None;
-			t.Leave += DueDateBox_Leave;
+			DueDateTextBox t = new DueDateTextBox(l, l.Width, nodeClicked);
 
-			//MessageBox.Show(nodeClicked.numDates.ToString());
+			if (tag.Item2 != -1)
+			{
+				t.Text = "HW #1";
+				t.Location = new Point(l.Width + 10, 20 * nodeClicked.numDates);
+				t.Size = new Size(110, 18);
+				t.BorderStyle = BorderStyle.None;
+				t.Leave += DueDateBox_Leave;
+
+				nodeClicked.Controls.Add(t.InitDotLabel(5, 20 * nodeClicked.numDates + 5, l.ForeColor));
+			}
+			else
+			{
+				t.Text = "HW #1";
+				t.Location = new Point(13, 20 * nodeClicked.numDates);
+				t.Size = new Size(110, 18);
+				t.BorderStyle = BorderStyle.None;
+				t.Leave += DueDateBox_Leave;
+
+				nodeClicked.Controls.Add(t.InitDotLabel(5, 20 * nodeClicked.numDates + 5, Color.Black));
+			}
+
+			
+
 			nodeClicked.Controls.Add(l);
 			nodeClicked.Controls.Add(t);
-			nodeClicked.numDates++;
 
 			using (SQLiteCommand cmd = new SQLiteCommand("INSERT INTO " + sched_table + " (name, tag_id, date) VALUES (@name, @tag_id, @date)", SQLCon))
 			{
@@ -311,6 +402,8 @@ namespace DeadlineScheduler
 				cmd.Parameters.AddWithValue("@date", dueDate);
 				cmd.ExecuteNonQuery();
 			}
+
+			t.rowid = Convert.ToInt32(SQLCon.LastInsertRowId);
 		}
 
 		private void DueDateBox_Leave(object sender, EventArgs e)
