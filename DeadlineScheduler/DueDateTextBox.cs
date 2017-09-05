@@ -20,7 +20,9 @@ namespace DeadlineScheduler
 
 		public Label dotLabel;
 
-		public DueDateTextBox(Label l, int _spaceBetween, CalendarNode _parent)
+		public int rowIndex { get; set; }
+
+		public DueDateTextBox(Label l, int _spaceBetween, CalendarNode _parent, int _rowIndex)
 		{
 			spaceBetween = _spaceBetween;
 
@@ -33,6 +35,7 @@ namespace DeadlineScheduler
 			}
 
 			parent = _parent;
+			rowIndex = _rowIndex;
 		}
 
 		public Label InitDotLabel(int x, int y, Color c)

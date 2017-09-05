@@ -53,7 +53,7 @@ namespace DeadlineScheduler
 		private void Form1_Load(object sender, EventArgs e)
 		{
 			this.Text = sched_name;
-
+			this.BringToFront();
 			colorsUsed = new ColorUsed[6];
 
 			for (int i = 0; i < 6; i++)
@@ -70,8 +70,8 @@ namespace DeadlineScheduler
 			calendar.Text = DateTime.Now.ToString("MMMM");
 			this.Controls.Add(calendar);
 
-			CreateDayOfWeekLabels();
-
+			
+			
 			LoadTags();
 
 			firstDay = DateTime.Now.StartOfWeek(DayOfWeek.Sunday);
@@ -83,7 +83,7 @@ namespace DeadlineScheduler
 			for (int i = 0; i < 7; i++)
 			{
 				Label l = new Label();
-				l.Text = Enum.GetName(typeof(DayOfWeek), i).Substring(0, 2) + "                                          ";
+				l.Text = Enum.GetName(typeof(DayOfWeek), i).Substring(0, 2); //+ "                                          ";
 				l.Location = new Point(i * width + x_offset, 40);
 				l.Visible = true;
 				l.AutoSize = false;
@@ -190,6 +190,29 @@ namespace DeadlineScheduler
 								parent.Controls.Remove(d.tagLabel);
 
 							parent.Controls.Remove(d);
+
+							if (d.rowIndex < parent.numDates)
+							{
+								foreach (Control c in parent.Controls)
+								{
+									if (c is DueDateTextBox)
+									{
+										DueDateTextBox d1 = (DueDateTextBox)c;
+
+										if (d1.rowIndex > d.rowIndex)
+										{
+											d1.Location = new Point(d1.Location.X, d1.Location.Y - 20);
+											d1.dotLabel.Location = new Point(d1.dotLabel.Location.X, d1.dotLabel.Location.Y - 20);
+											if (d1.tagLabel != null)
+											{
+												d1.tagLabel.Location = new Point(d1.tagLabel.Location.X, d1.tagLabel.Location.Y - 20);
+												d1.rowIndex--;
+											}
+										}
+									}
+								}
+							}
+
 							parent.numDates--;
 						}
 
@@ -262,7 +285,7 @@ namespace DeadlineScheduler
 								l.Size = TextRenderer.MeasureText(l.Text, l.Font);
 								l.BackColor = Color.Transparent;
 
-								DueDateTextBox t = new DueDateTextBox(l, l.Width, days[date]);
+								DueDateTextBox t = new DueDateTextBox(l, l.Width, days[date], days[date].numDates); //???
 								t.Text = dueDateName;
 								t.Location = new Point(l.Width + 10, 20 * days[date].numDates);
 								t.Size = new Size(100, 18);
@@ -276,7 +299,7 @@ namespace DeadlineScheduler
 							}
 							else
 							{
-								DueDateTextBox t = new DueDateTextBox(l, -1, days[date]);
+								DueDateTextBox t = new DueDateTextBox(l, -1, days[date], days[date].numDates);
 								t.Text = dueDateName;
 								t.Location = new Point(13, 20 * days[date].numDates);
 								t.Size = new Size(100, 18);
@@ -317,6 +340,8 @@ namespace DeadlineScheduler
 		{
 			calendar.Controls.Clear();
 
+			CreateDayOfWeekLabels();
+
 			LoadWeek(firstDay, 0);
 			LoadWeek(firstDay.AddDays(7), 1);
 			LoadWeek(firstDay.AddDays(14), 2);
@@ -330,7 +355,6 @@ namespace DeadlineScheduler
 			Label l = new Label();
 			l.Text = "";
 			l.Visible = true;
-			//l.AutoSize = true;
 
 			for (int i = 0; i < classCount; i++)
 			{
@@ -365,9 +389,9 @@ namespace DeadlineScheduler
 			
 
 			Label l = tag.Item1;
-			l.Location = new Point(5, 20 * ++nodeClicked.numDates);
+			l.Location = new Point(10, 20 * ++nodeClicked.numDates);
 
-			DueDateTextBox t = new DueDateTextBox(l, l.Width, nodeClicked);
+			DueDateTextBox t = new DueDateTextBox(l, l.Width, nodeClicked, nodeClicked.numDates);
 
 			if (tag.Item2 != -1)
 			{
@@ -390,14 +414,12 @@ namespace DeadlineScheduler
 				nodeClicked.Controls.Add(t.InitDotLabel(5, 20 * nodeClicked.numDates + 5, Color.Black));
 			}
 
-			
-
 			nodeClicked.Controls.Add(l);
 			nodeClicked.Controls.Add(t);
 
 			using (SQLiteCommand cmd = new SQLiteCommand("INSERT INTO " + sched_table + " (name, tag_id, date) VALUES (@name, @tag_id, @date)", SQLCon))
 			{
-				cmd.Parameters.AddWithValue("@name", "HW1");
+				cmd.Parameters.AddWithValue("@name", "HW #1");
 				cmd.Parameters.AddWithValue("@tag_id", tag.Item2);
 				cmd.Parameters.AddWithValue("@date", dueDate);
 				cmd.ExecuteNonQuery();
