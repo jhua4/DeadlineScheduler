@@ -126,9 +126,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RoundLabel.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="RoundPanel.cs">
       <SubType>Component</SubType>
     </Compile>

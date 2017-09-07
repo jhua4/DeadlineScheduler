@@ -480,6 +480,8 @@ namespace DeadlineScheduler
 
 		private void ScheduleView_FormClosing(object sender, FormClosingEventArgs e)
 		{
+			this.Focus();
+
 			using (SQLiteCommand cmd = new SQLiteCommand("UPDATE schedule_names SET last_update = @now WHERE rowid = @rowid", SQLCon))
 			{
 				cmd.Parameters.AddWithValue("@now", DateTime.Now);
