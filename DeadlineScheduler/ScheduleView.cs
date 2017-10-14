@@ -1,15 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SQLite;
-using System.IO;
-using System.Reflection;
 
 namespace DeadlineScheduler
 {
@@ -33,10 +26,16 @@ namespace DeadlineScheduler
 
 		private DateTime firstDay;
 
+		static public Color c1 = Color.FromArgb(0x18, 0x20, 0x6F);
+		public Color c2 = Color.FromArgb(0x17, 0x25, 0x5A);
+		public Color c3 = Color.FromArgb(0xF5, 0xE2, 0xC8);
+		public Color c4 = Color.FromArgb(0xD8, 0x83, 0x73);
+		static public Color c5 = Color.FromArgb(0xBD, 0x1E, 0x1E);
+
 		CalendarNode[] cNodes;
 		Dictionary<DateTime, CalendarNode> days;
 		Dictionary<int, Tag> tags;
-		Color[] colors = new Color[] { Color.Purple, Color.Orange, Color.DeepSkyBlue, Color.ForestGreen, Color.Fuchsia, Color.Navy };
+		Color[] colors = new Color[] { Color.Purple, c1, Color.DeepSkyBlue, Color.ForestGreen, c5, Color.Navy };
 		ColorUsed[] colorsUsed;
 
 		private int colorIter = 0;
@@ -47,7 +46,10 @@ namespace DeadlineScheduler
 		private int height = 150;
 		private int x_offset = 20;
 		private int y_offset = 100;
-		
+
+		Button UpButton;
+		Button DownButton;
+
 		RoundPanel calendar = new RoundPanel();
 
 		private void Form1_Load(object sender, EventArgs e)
@@ -55,6 +57,28 @@ namespace DeadlineScheduler
 			this.Text = sched_name;
 			this.BringToFront();
 			colorsUsed = new ColorUsed[6];
+
+			this.BackColor = c3;
+			//calendar.BackColor = c3;
+
+			UpButton = new Button();
+			DownButton = new Button();
+
+			UpButton.Text = "<-";
+			DownButton.Text = "->";
+
+			//set colors
+			AddBtn.BackColor = c1;
+			AddBtn.ForeColor = Color.White;
+
+			MenuBtn.BackColor = c1;
+			MenuBtn.ForeColor = Color.White;
+
+			UpButton.BackColor = c1;
+			UpButton.ForeColor = Color.White;
+
+			DownButton.BackColor = c1;
+			DownButton.ForeColor = Color.White;
 
 			for (int i = 0; i < 6; i++)
 			{
@@ -66,12 +90,30 @@ namespace DeadlineScheduler
 
 			calendar = new RoundPanel();
 			calendar.Size = new Size(1150, 750);
-			calendar.Location = new Point(140, 0);
+			calendar.Location = new Point(10, 10);
 			calendar.Text = DateTime.Now.ToString("MMMM");
 			this.Controls.Add(calendar);
+			calendar.TitleBackColor = c5;
+			calendar.TitleForeColor = c1;
 
-			
-			
+			//l.Location = new Point(i * width + x_offset, 40);
+			UpButton.Location = new Point(x_offset, 70);
+			DownButton.Location = new Point(7 * width - DownButton.Width, 70);
+
+			UpButton.FlatStyle = FlatStyle.Flat;
+			DownButton.FlatStyle = FlatStyle.Flat;
+
+			UpButton.Click += UpButton_Click;
+			DownButton.Click += DownButton_Click;
+
+			//UpButton.AutoSize = true;
+
+			calendar.Controls.Add(UpButton);
+			calendar.Controls.Add(DownButton);
+
+			UpButton.Visible = true;
+			DownButton.Visible = true;
+
 			LoadTags();
 
 			firstDay = DateTime.Now.StartOfWeek(DayOfWeek.Sunday);
@@ -89,6 +131,7 @@ namespace DeadlineScheduler
 				l.AutoSize = false;
 				l.Width = 160;
 				l.Font = new Font(l.Font.FontFamily, 14, FontStyle.Underline);
+				l.ForeColor = c2;
 				calendar.Controls.Add(l);
 			}
 		}
@@ -130,18 +173,21 @@ namespace DeadlineScheduler
 					CalendarNode cNode = new CalendarNode(i * width + x_offset, rowIndex * height + y_offset);
 
 					Label l = new Label();
-					l.Text = firstDay.ToString("MMM") + " " + firstDay.AddDays(i).Day.ToString();
+					l.Text = firstDay.AddDays(i).ToString("MMM") + " " + firstDay.AddDays(i).Day.ToString();
 					l.Visible = true;
 					l.Size = new Size(90, 18);
 					l.Location = new Point(10, 0);
 					l.BackColor = Color.Transparent;
-
+					l.ForeColor = c2;
+					l.Font = new Font(l.Font, FontStyle.Bold);
 					cNode.date = firstDay.AddDays(i);
+
+					cNode.BackColor = c3;
 
 					if (cNode.date == new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day))
 					{
 						Label ll = new Label();
-						ll.BackColor = Color.Green;
+						ll.BackColor = c2;
 						ll.AutoSize = false;
 						ll.Size = new Size(160, 6);
 						ll.Location = new Point(0, 114);
@@ -247,16 +293,16 @@ namespace DeadlineScheduler
 					days[cNode.date] = cNode;
 				}
 
-				if (firstDay == DateTime.Now.StartOfWeek(DayOfWeek.Sunday))
-				{
-					Label l = new Label();
-					l.BackColor = Color.Green;
-					l.AutoSize = false;
-					l.Size = new Size(5, 120);
-					l.Location = new Point(0, 0);
-					days[firstDay].Controls.Add(l);
-					//MessageBox.Show("?" + firstDay.ToString());
-				}
+				//if (firstDay == DateTime.Now.StartOfWeek(DayOfWeek.Sunday))
+				//{
+				//	Label l = new Label();
+				//	l.BackColor = Color.Green;
+				//	l.AutoSize = false;
+				//	l.Size = new Size(5, 120);
+				//	l.Location = new Point(0, 0);
+				//	days[firstDay].Controls.Add(l);
+				//	//MessageBox.Show("?" + firstDay.ToString());
+				//}
 
 				using (SQLiteCommand cmd = new SQLiteCommand("SELECT *, rowid FROM " + sched_table + " WHERE date >= @fd AND date <= @ld", SQLCon))
 				{
@@ -292,6 +338,7 @@ namespace DeadlineScheduler
 								t.BorderStyle = BorderStyle.None;
 								t.LostFocus += DueDateBox_Leave;
 								t.rowid = rowid;
+								t.BackColor = c3;
 
 								days[date].Controls.Add(t.InitDotLabel(5, 20 * days[date].numDates + 5, l.ForeColor));
 								days[date].Controls.Add(l);
@@ -306,6 +353,7 @@ namespace DeadlineScheduler
 								t.BorderStyle = BorderStyle.None;
 								t.LostFocus += DueDateBox_Leave;
 								t.rowid = rowid;
+								t.BackColor = c3;
 
 								days[date].Controls.Add(t.InitDotLabel(5, 20 * days[date].numDates + 5, Color.Black));
 								days[date].Controls.Add(t);
@@ -329,6 +377,8 @@ namespace DeadlineScheduler
 						TagPanel.Controls.Add(t.InitRB(++classCount));
 						TagPanel.Controls.Add(t.InitNamebox(classCount));
 						t.tagNameBox.Text = (string)reader[0];
+						t.tagNameBox.BackColor = c3;
+						
 						t.rowid = Convert.ToInt32((Int64)reader[2]);
 						tags[Convert.ToInt32((Int64)reader[2])] = t;
 					}
@@ -341,6 +391,9 @@ namespace DeadlineScheduler
 			calendar.Controls.Clear();
 
 			CreateDayOfWeekLabels();
+
+			calendar.Controls.Add(UpButton);
+			calendar.Controls.Add(DownButton);
 
 			LoadWeek(firstDay, 0);
 			LoadWeek(firstDay.AddDays(7), 1);
@@ -385,13 +438,12 @@ namespace DeadlineScheduler
 			DateTime dueDate = nodeClicked.date;
 
 			Tuple<Label, int> tag = GetSelectedTagInfo();
-			
-			
 
 			Label l = tag.Item1;
 			l.Location = new Point(10, 20 * ++nodeClicked.numDates);
 
 			DueDateTextBox t = new DueDateTextBox(l, l.Width, nodeClicked, nodeClicked.numDates);
+			t.BackColor = c3;
 
 			if (tag.Item2 != -1)
 			{
@@ -399,7 +451,7 @@ namespace DeadlineScheduler
 				t.Location = new Point(l.Width + 10, 20 * nodeClicked.numDates);
 				t.Size = new Size(110, 18);
 				t.BorderStyle = BorderStyle.None;
-				t.Leave += DueDateBox_Leave;
+				t.LostFocus += DueDateBox_Leave;
 
 				nodeClicked.Controls.Add(t.InitDotLabel(5, 20 * nodeClicked.numDates + 5, l.ForeColor));
 			}
@@ -409,7 +461,7 @@ namespace DeadlineScheduler
 				t.Location = new Point(13, 20 * nodeClicked.numDates);
 				t.Size = new Size(110, 18);
 				t.BorderStyle = BorderStyle.None;
-				t.Leave += DueDateBox_Leave;
+				t.LostFocus += DueDateBox_Leave;
 
 				nodeClicked.Controls.Add(t.InitDotLabel(5, 20 * nodeClicked.numDates + 5, Color.Black));
 			}
@@ -453,6 +505,8 @@ namespace DeadlineScheduler
 			TagPanel.Controls.Add(t.InitRB(++classCount));
 			TagPanel.Controls.Add(t.InitNamebox(classCount));
 
+			t.tagNameBox.BackColor = c3;
+
 			using (SQLiteCommand cmd = new SQLiteCommand("INSERT INTO " + tag_ids_table + " (name, color_id) VALUES (@name, @color_id)", SQLCon))
 			{
 				cmd.Parameters.AddWithValue("@name", "NewClass");
@@ -493,6 +547,29 @@ namespace DeadlineScheduler
 		private void ScheduleView_Click(object sender, EventArgs e)
 		{
 			
+		}
+
+		private void MenuBtn_Click(object sender, EventArgs e)
+		{
+			FormCollection openForms = Application.OpenForms;
+
+			bool menuOpen = false;
+
+			foreach (Form f in openForms)
+			{
+				if (f.Name == "StartMenu")
+				{
+					menuOpen = true;
+					f.BringToFront();
+				}
+			}
+
+			if (!menuOpen)
+			{
+				StartMenu menu = new StartMenu();
+				menu.openedFromScheduleView = true;
+				menu.Show();
+			}
 		}
 	}
 

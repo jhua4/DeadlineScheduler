@@ -31,22 +31,21 @@
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScheduleView));
 			this.AddBtn = new System.Windows.Forms.Button();
 			this.TagPanel = new System.Windows.Forms.Panel();
-			this.UpButton = new System.Windows.Forms.Button();
-			this.DownButton = new System.Windows.Forms.Button();
+			this.MenuBtn = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// AddBtn
 			// 
 			this.AddBtn.BackColor = System.Drawing.Color.ForestGreen;
 			this.AddBtn.FlatAppearance.BorderColor = System.Drawing.Color.Black;
-			this.AddBtn.FlatAppearance.BorderSize = 3;
+			this.AddBtn.FlatAppearance.BorderSize = 0;
 			this.AddBtn.FlatAppearance.MouseDownBackColor = System.Drawing.Color.PaleGreen;
 			this.AddBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.AddBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.AddBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.AddBtn.ForeColor = System.Drawing.Color.White;
-			this.AddBtn.Location = new System.Drawing.Point(1340, 80);
+			this.AddBtn.Location = new System.Drawing.Point(1190, 80);
 			this.AddBtn.Name = "AddBtn";
-			this.AddBtn.Size = new System.Drawing.Size(160, 43);
+			this.AddBtn.Size = new System.Drawing.Size(160, 37);
 			this.AddBtn.TabIndex = 0;
 			this.AddBtn.Text = "Add Tag";
 			this.AddBtn.UseVisualStyleBackColor = false;
@@ -54,38 +53,34 @@
 			// 
 			// TagPanel
 			// 
-			this.TagPanel.Location = new System.Drawing.Point(1320, 140);
+			this.TagPanel.Location = new System.Drawing.Point(1180, 140);
 			this.TagPanel.Name = "TagPanel";
 			this.TagPanel.Size = new System.Drawing.Size(200, 621);
 			this.TagPanel.TabIndex = 1;
 			// 
-			// UpButton
+			// MenuBtn
 			// 
-			this.UpButton.Location = new System.Drawing.Point(25, 306);
-			this.UpButton.Name = "UpButton";
-			this.UpButton.Size = new System.Drawing.Size(75, 23);
-			this.UpButton.TabIndex = 2;
-			this.UpButton.Text = "button1";
-			this.UpButton.UseVisualStyleBackColor = true;
-			this.UpButton.Click += new System.EventHandler(this.UpButton_Click);
-			// 
-			// DownButton
-			// 
-			this.DownButton.Location = new System.Drawing.Point(25, 418);
-			this.DownButton.Name = "DownButton";
-			this.DownButton.Size = new System.Drawing.Size(75, 23);
-			this.DownButton.TabIndex = 3;
-			this.DownButton.Text = "button2";
-			this.DownButton.UseVisualStyleBackColor = true;
-			this.DownButton.Click += new System.EventHandler(this.DownButton_Click);
+			this.MenuBtn.BackColor = System.Drawing.Color.ForestGreen;
+			this.MenuBtn.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+			this.MenuBtn.FlatAppearance.BorderSize = 0;
+			this.MenuBtn.FlatAppearance.MouseDownBackColor = System.Drawing.Color.PaleGreen;
+			this.MenuBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.MenuBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.MenuBtn.ForeColor = System.Drawing.Color.White;
+			this.MenuBtn.Location = new System.Drawing.Point(1190, 31);
+			this.MenuBtn.Name = "MenuBtn";
+			this.MenuBtn.Size = new System.Drawing.Size(160, 37);
+			this.MenuBtn.TabIndex = 2;
+			this.MenuBtn.Text = "Menu";
+			this.MenuBtn.UseVisualStyleBackColor = false;
+			this.MenuBtn.Click += new System.EventHandler(this.MenuBtn_Click);
 			// 
 			// ScheduleView
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.BackColor = System.Drawing.Color.White;
-			this.ClientSize = new System.Drawing.Size(1532, 773);
-			this.Controls.Add(this.DownButton);
-			this.Controls.Add(this.UpButton);
+			this.ClientSize = new System.Drawing.Size(1392, 773);
+			this.Controls.Add(this.MenuBtn);
 			this.Controls.Add(this.TagPanel);
 			this.Controls.Add(this.AddBtn);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -102,8 +97,7 @@
 
 		private System.Windows.Forms.Button AddBtn;
 		private System.Windows.Forms.Panel TagPanel;
-		private System.Windows.Forms.Button UpButton;
-		private System.Windows.Forms.Button DownButton;
+		private System.Windows.Forms.Button MenuBtn;
 	}
 }
 

@@ -59,6 +59,7 @@
 			this.SaveOptionBox.AutoSize = true;
 			this.SaveOptionBox.Checked = true;
 			this.SaveOptionBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.SaveOptionBox.Enabled = false;
 			this.SaveOptionBox.Location = new System.Drawing.Point(1003, 36);
 			this.SaveOptionBox.Name = "SaveOptionBox";
 			this.SaveOptionBox.Size = new System.Drawing.Size(125, 21);

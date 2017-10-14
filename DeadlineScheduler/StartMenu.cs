@@ -33,6 +33,10 @@ namespace DeadlineScheduler
 		private int scheduleCount = 0;
 		private SQLiteConnection SQLCon;
 
+		private ScheduleButton firstSched = null;
+
+		public bool openedFromScheduleView = false; //if this view was opened from a ScheduleView
+
 		public StartMenu()
 		{
 			InitializeComponent();
@@ -80,6 +84,12 @@ namespace DeadlineScheduler
 						}
 					}
 				}
+			}
+
+			if (firstSched != null && !openedFromScheduleView) //automatically opens first schedule
+			{
+				firstSched.PerformClick();
+				this.Close();
 			}
 			
 		}
@@ -178,6 +188,9 @@ namespace DeadlineScheduler
 			b.Location = new Point(0, 60 * scheduleCount);
 			b.FlatAppearance.MouseOverBackColor = Color.Transparent;
 			b.FlatAppearance.MouseDownBackColor = Color.Transparent;
+
+			if (firstSched == null)
+				firstSched = b;
 
 			Label l = new Label();
 			l.Text = "Last Updated: " + lastUpdate.ToString("MM/dd/yyyy hh:mm tt");
