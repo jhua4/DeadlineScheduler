@@ -13,6 +13,7 @@ namespace DeadlineScheduler
 		public RemoveLabel()
 		{
 			this.BackColor = System.Drawing.Color.Transparent;
+			this.ForeColor = Color.White;
 			this.Image = new Bitmap(DeadlineScheduler.Properties.Resources.trash_small_2);
 			this.Text = "REMOVE";
 			this.Font = new Font(this.Font.FontFamily, 6, FontStyle.Regular);

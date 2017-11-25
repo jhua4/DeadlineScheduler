@@ -27,15 +27,18 @@ namespace DeadlineScheduler
 		private DateTime firstDay;
 
 		static public Color c1 = Color.FromArgb(0x18, 0x20, 0x6F);
-		public Color c2 = Color.FromArgb(0x17, 0x25, 0x5A);
+		//public Color c2 = Color.FromArgb(0x17, 0x25, 0x5A);
+		static public Color c2 = Color.FromArgb(230, 219, 116);
 		public Color c3 = Color.FromArgb(0xF5, 0xE2, 0xC8);
 		public Color c4 = Color.FromArgb(0xD8, 0x83, 0x73);
 		static public Color c5 = Color.FromArgb(0xBD, 0x1E, 0x1E);
 
+		public Color c6 = Color.FromArgb(27, 28, 22); //grey color from Monokai theme
+
 		CalendarNode[] cNodes;
 		Dictionary<DateTime, CalendarNode> days;
 		Dictionary<int, Tag> tags;
-		Color[] colors = new Color[] { Color.Purple, c1, Color.DeepSkyBlue, Color.ForestGreen, c5, Color.Navy };
+		Color[] colors = new Color[] { Color.Magenta, c2, Color.DeepSkyBlue, Color.ForestGreen, c5, Color.Navy };
 		ColorUsed[] colorsUsed;
 
 		private int colorIter = 0;
@@ -58,9 +61,10 @@ namespace DeadlineScheduler
 			this.BringToFront();
 			colorsUsed = new ColorUsed[6];
 
-			this.BackColor = c3;
+			//this.BackColor = c3;
+			this.BackColor = c6;
 			//calendar.BackColor = c3;
-
+			calendar.ForeColor = c2;
 			UpButton = new Button();
 			DownButton = new Button();
 
@@ -93,8 +97,8 @@ namespace DeadlineScheduler
 			calendar.Location = new Point(10, 10);
 			calendar.Text = DateTime.Now.ToString("MMMM");
 			this.Controls.Add(calendar);
-			calendar.TitleBackColor = c5;
-			calendar.TitleForeColor = c1;
+			calendar.TitleBackColor = c6;
+			calendar.TitleForeColor = c2;
 
 			//l.Location = new Point(i * width + x_offset, 40);
 			UpButton.Location = new Point(x_offset, 70);
@@ -171,6 +175,7 @@ namespace DeadlineScheduler
 				for (int i = 0; i < 7; i++)
 				{
 					CalendarNode cNode = new CalendarNode(i * width + x_offset, rowIndex * height + y_offset);
+					cNode.BorderStyle = BorderStyle.FixedSingle;
 
 					Label l = new Label();
 					l.Text = firstDay.AddDays(i).ToString("MMM") + " " + firstDay.AddDays(i).Day.ToString();
@@ -178,16 +183,18 @@ namespace DeadlineScheduler
 					l.Size = new Size(90, 18);
 					l.Location = new Point(10, 0);
 					l.BackColor = Color.Transparent;
-					l.ForeColor = c2;
+					//l.ForeColor = c2;
+					l.ForeColor = Color.FromArgb(249, 38, 89);
 					l.Font = new Font(l.Font, FontStyle.Bold);
 					cNode.date = firstDay.AddDays(i);
 
-					cNode.BackColor = c3;
+					cNode.BackColor = c6;
 
 					if (cNode.date == new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day))
 					{
 						Label ll = new Label();
-						ll.BackColor = c2;
+						//ll.BackColor = c2;
+						ll.BackColor = Color.FromArgb(166, 226, 46);
 						ll.AutoSize = false;
 						ll.Size = new Size(160, 6);
 						ll.Location = new Point(0, 114);
@@ -338,7 +345,8 @@ namespace DeadlineScheduler
 								t.BorderStyle = BorderStyle.None;
 								t.LostFocus += DueDateBox_Leave;
 								t.rowid = rowid;
-								t.BackColor = c3;
+								t.BackColor = c6;
+								t.ForeColor = Color.White;
 
 								days[date].Controls.Add(t.InitDotLabel(5, 20 * days[date].numDates + 5, l.ForeColor));
 								days[date].Controls.Add(l);
@@ -353,7 +361,7 @@ namespace DeadlineScheduler
 								t.BorderStyle = BorderStyle.None;
 								t.LostFocus += DueDateBox_Leave;
 								t.rowid = rowid;
-								t.BackColor = c3;
+								t.BackColor = c6;
 
 								days[date].Controls.Add(t.InitDotLabel(5, 20 * days[date].numDates + 5, Color.Black));
 								days[date].Controls.Add(t);
@@ -377,7 +385,7 @@ namespace DeadlineScheduler
 						TagPanel.Controls.Add(t.InitRB(++classCount));
 						TagPanel.Controls.Add(t.InitNamebox(classCount));
 						t.tagNameBox.Text = (string)reader[0];
-						t.tagNameBox.BackColor = c3;
+						t.tagNameBox.BackColor = c6;
 						
 						t.rowid = Convert.ToInt32((Int64)reader[2]);
 						tags[Convert.ToInt32((Int64)reader[2])] = t;
@@ -443,7 +451,8 @@ namespace DeadlineScheduler
 			l.Location = new Point(10, 20 * ++nodeClicked.numDates);
 
 			DueDateTextBox t = new DueDateTextBox(l, l.Width, nodeClicked, nodeClicked.numDates);
-			t.BackColor = c3;
+			t.BackColor = c6;
+			t.ForeColor = Color.White;
 
 			if (tag.Item2 != -1)
 			{
